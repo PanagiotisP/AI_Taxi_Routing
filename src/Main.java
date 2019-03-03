@@ -9,6 +9,6 @@ public class Main {
 
         CSVReader CSVFileReader = new CSVReader();
 
-        List<String[]> test = CSVFileReader.read(clientPath);
+        
     }
 }
