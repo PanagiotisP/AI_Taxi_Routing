@@ -1,9 +1,14 @@
 import java.util.*;
 
 public class Main {
+    // This method takes the nodes input and returns a List of all different Nodes while connecting each node to its
+    // neighbours
     public static List<Node> connectNeighbours(List<String[]> nodeStringList) {
-        String[] first = nodeStringList.remove(0);
+
+        // Array which stores every Node (including duplicates). Used to find duplicates by sorting
         Node[] nodeArray = new Node[nodeStringList.size()];
+
+        // Returned List
         List<Node> nodeList = new ArrayList<>();
 
         int prevLineId;
@@ -17,12 +22,15 @@ public class Main {
             node = nodeStringList.get(i);
             nodeArray[i] = new Node(Double.parseDouble(node[0]), Double.parseDouble(node[1]));
             curLineId = Integer.parseInt(node[2]);
+
+            // If nodes on same line, connect them
             if(prevLineId == curLineId) {
                 nodeArray[i - 1].addNeighbour(nodeArray[i]);
                 nodeArray[i].addNeighbour(nodeArray[i - 1]);
             }
         }
 
+        // Sort array first by X and then by Y
         Arrays.sort(nodeArray, new Comparator<Node>() {
             @Override
             public int compare(Node a, Node b) {
@@ -48,12 +56,16 @@ public class Main {
         Node curNode = null;
         for(int i = 1; i < nodeArray.length; i++) {
             curNode = nodeArray[i];
+
+            // On duplicate Node, transfer previous appearance's neighbours to next one
             if(curNode.getX() == prevNode.getX() && curNode.getY() == prevNode.getY()) {
                 for(Node neighbhour : prevNode.getNeighbours()) {
                     curNode.addNeighbour(neighbhour);
                     neighbhour.addNeighbour(curNode);
                 }
             }
+
+            // On not duplicate Node or on solo appearance, add it to List
             else {
                 nodeList.add(prevNode);
             }
