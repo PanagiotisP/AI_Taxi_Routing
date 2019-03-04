@@ -1,12 +1,15 @@
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class Node {
     private double x;
     private double y;
     private double heuristicValue = 0;
     private double pathCost = 0;
-    private List<Node> neighbours = new ArrayList<>();
+    private boolean visited = false;
+    private List<Node> neighbours = new LinkedList<>();
+    private Set<Node> previous = new HashSet<>();
+    private List<Integer> startingIds = null;
+
 
     Node(double x, double y) {
         this.x = x;
@@ -23,7 +26,17 @@ public class Node {
     }
 
     public void addNeighbour(Node newNeighbour) {
-        neighbours.add(newNeighbour);
+        if(!(newNeighbour.getX() == x && newNeighbour.getY() == y)) {
+            neighbours.add(newNeighbour);
+        }
+    }
+
+    public void removeNeighbour(Node newNeighbour) {
+        neighbours.remove(newNeighbour);
+    }
+
+    public void addPrevious(Node previousNode) {
+        previous.add(previousNode);
     }
 
     public double getX() {
@@ -32,6 +45,21 @@ public class Node {
 
     public void setX(double x) {
         this.x = x;
+    }
+
+    public double getY() {
+        return y;
+    }
+
+    public void setY(double y) {
+        this.y = y;
+    }
+
+    public void addTaxiId(int taxiId) {
+        if(startingIds == null) {
+            startingIds = new LinkedList<>();
+        }
+        startingIds.add(taxiId);
     }
 
     public double getHeuristicValue() {
@@ -58,11 +86,40 @@ public class Node {
         this.neighbours = neighbours;
     }
 
-    public double getY() {
-        return y;
+    public Set<Node> getPrevious() {
+        return previous;
     }
 
-    public void setY(double y) {
-        this.y = y;
+    public boolean isVisited() {
+        return visited;
+    }
+
+    public void setVisited(boolean visited) {
+        this.visited = visited;
+    }
+
+    public void setPrevious(Set<Node> previous) {
+        this.previous = previous;
+    }
+
+    public List<Integer> getStartingIds() {
+        return startingIds;
+    }
+
+    public void setStartingIds(List<Integer> startingIds) {
+        this.startingIds = startingIds;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Node point = (Node) o;
+
+        if (x != point.getX()) return false;
+        if (y != point.getY()) return false;
+
+        return true;
     }
 }

@@ -28,6 +28,7 @@ public class Main {
                 nodeArray[i - 1].addNeighbour(nodeArray[i]);
                 nodeArray[i].addNeighbour(nodeArray[i - 1]);
             }
+            prevLineId = curLineId;
         }
 
         // Sort array first by X and then by Y
@@ -61,6 +62,7 @@ public class Main {
             if(curNode.getX() == prevNode.getX() && curNode.getY() == prevNode.getY()) {
                 for(Node neighbhour : prevNode.getNeighbours()) {
                     curNode.addNeighbour(neighbhour);
+                    neighbhour.getNeighbours().remove(prevNode);
                     neighbhour.addNeighbour(curNode);
                 }
             }
@@ -70,9 +72,9 @@ public class Main {
                 nodeList.add(prevNode);
             }
             prevNode = nodeArray[i];
+
         }
         nodeList.add(prevNode);
-
         return nodeList;
     }
 
@@ -99,25 +101,44 @@ public class Main {
         return inputNode;
     }
 
+    //DFS scan of target to previous to find all nearest paths
+    public static void printPaths(LinkedList<Node> pathSoFar, KmlWriter outFile){
+
+        //if no previous Point print the path
+        if(pathSoFar.getLast().getPrevious().isEmpty()){
+            outFile.newTaxiRoute(pathSoFar);
+        }
+        else {
+            for(Node prevNode : pathSoFar.getLast().getPrevious()){      // scan previous and for each add to new path and run recursively
+                pathSoFar.addLast(prevNode);
+                printPaths(pathSoFar, outFile);
+                pathSoFar.removeLast();
+            }
+        }
+    }
+
     public static void main(String[] args) {
         String clientPath = "Data\\client.csv";
         String taxisPath = "Data\\taxis.csv";
         String nodesPath = "Data\\nodes.csv";
-        List<Node> nodesList;
+        String kmlPath = "Data\\routes.kml";
+        List<Node> nodeList;
 
         CSVReader CSVFileReader = new CSVReader();
 
         List<String[]> inputStringList = CSVFileReader.read(nodesPath);
         inputStringList.remove(0);
-        List<Node> nodeList = Main.connectNeighbours(inputStringList);
+        nodeList = Main.connectNeighbours(inputStringList);
 
         // Read taxis and create a taxiList with taxi nodes
         inputStringList = CSVFileReader.read(taxisPath);
         inputStringList.remove(0);
 
-        List<Node> taxiList = new LinkedList<>();
+        List<Node> taxiList= new LinkedList<>();
         for(String[] taxi : inputStringList) {
-            taxiList.add(findNearestNode(nodeList, taxi));
+            Node taxiNode = findNearestNode(nodeList, taxi);
+            taxiNode.addTaxiId(Integer.parseInt(taxi[2]));
+            taxiList.add(taxiNode);
         }
 
 
@@ -127,6 +148,15 @@ public class Main {
 
         Node target = findNearestNode(nodeList, inputStringList.get(0));
 
+        AStar solver = new AStar(nodeList, target);
+        solver.initialiseHeuristic();
+        solver.solve(taxiList);
 
+        KmlWriter outFile = new KmlWriter(kmlPath);
+        outFile.printIntroKml();
+        LinkedList<Node> pathSoFar = new LinkedList<>();
+        pathSoFar.addFirst(target);
+        Main.printPaths(pathSoFar, outFile);
+        outFile.endKml();
     }
 }
