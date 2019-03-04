@@ -1,9 +1,10 @@
 import java.util.*;
 
 public class Main {
-    public List<Node> connectNeighbours(List<String[]> nodeStringList) {
+    public static List<Node> connectNeighbours(List<String[]> nodeStringList) {
         String[] first = nodeStringList.remove(0);
         Node[] nodeArray = new Node[nodeStringList.size()];
+        List<Node> nodeList = new ArrayList<>();
 
         int prevLineId;
         int curLineId;
@@ -42,12 +43,25 @@ public class Main {
                 return 0;
             }
         });
+
+        Node prevNode = nodeArray[0];
+        Node curNode = null;
         for(int i = 1; i < nodeArray.length; i++) {
-            if(nodeArray[i].getX() == nodeArray[i - 1].getX() && nodeArray[i].getY() == nodeArray[i - 1].getY()) {
-                nodeArray[i].g
+            curNode = nodeArray[i];
+            if(curNode.getX() == prevNode.getX() && curNode.getY() == prevNode.getY()) {
+                for(Node neighbhour : prevNode.getNeighbours()) {
+                    curNode.addNeighbour(neighbhour);
+                    neighbhour.addNeighbour(curNode);
+                }
             }
+            else {
+                nodeList.add(prevNode);
+            }
+            prevNode = nodeArray[i];
         }
-        return
+        nodeList.add(prevNode);
+
+        return nodeList;
     }
 
 
@@ -60,8 +74,9 @@ public class Main {
 
         CSVReader CSVFileReader = new CSVReader();
 
-        List<String[]> nodeList = CSVFileReader.read(nodesPath);
-        nodeList.remove(0);
+        List<String[]> nodeStringList = CSVFileReader.read(nodesPath);
+        nodeStringList.remove(0);
+        List<Node> nodeList = Main.connectNeighbours(nodeStringList);
 
     }
 }
