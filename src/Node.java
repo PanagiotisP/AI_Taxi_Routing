@@ -2,13 +2,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Node {
-    private int x;
-    private int y;
+    private double x;
+    private double y;
     private double heuristicValue = 0;
     private double pathCost = 0;
     private List<Node> neighbours = new ArrayList<>();
 
-    Node(int x, int y) {
+    Node(double x, double y) {
         this.x = x;
         this.y = y;
     }
@@ -26,11 +26,11 @@ public class Node {
         neighbours.add(newNeighbour);
     }
 
-    public int getX() {
+    public double getX() {
         return x;
     }
 
-    public void setX(int x) {
+    public void setX(double x) {
         this.x = x;
     }
 
@@ -38,7 +38,7 @@ public class Node {
         return heuristicValue;
     }
 
-    public void setHeuristicValue(int heuristicValue) {
+    public void setHeuristicValue(double heuristicValue) {
         this.heuristicValue = heuristicValue;
     }
 
@@ -46,7 +46,7 @@ public class Node {
         return pathCost;
     }
 
-    public void setPathCost(int pathCost) {
+    public void setPathCost(double pathCost) {
         this.pathCost = pathCost;
     }
 
@@ -58,11 +58,11 @@ public class Node {
         this.neighbours = neighbours;
     }
 
-    public int getY() {
+    public double getY() {
         return y;
     }
 
-    public void setY(int y) {
+    public void setY(double y) {
         this.y = y;
     }
 }
