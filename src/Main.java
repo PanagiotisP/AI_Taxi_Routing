@@ -76,7 +76,28 @@ public class Main {
         return nodeList;
     }
 
+    // This method finds the nearest (in distance) Node of given input coordinates
+    // It is essential to the program, as the client and taxis input do not correspond to any given node
+    public static Node findNearestNode(List<Node> nodeList, String[] input) {
+        double candidateX = Double.parseDouble(input[0]);
+        double candidateY = Double.parseDouble(input[1]);
+        Node tempNode = new Node(candidateX, candidateY);
+        Node inputNode = null;
+        double minDistance = Double.MAX_VALUE;
 
+        // Find nearest node to given inputNode
+        for(Node candidateNode : nodeList) {
+            double candidateDistance = candidateNode.calculateDistance(tempNode);
+            if(minDistance > candidateDistance) {
+                minDistance = candidateDistance;
+                inputNode = candidateNode;
+            }
+        }
+
+        // Add the distance as initial path cost
+        inputNode.setPathCost(minDistance);
+        return inputNode;
+    }
 
     public static void main(String[] args) {
         String clientPath = "Data\\client.csv";
@@ -86,9 +107,26 @@ public class Main {
 
         CSVReader CSVFileReader = new CSVReader();
 
-        List<String[]> nodeStringList = CSVFileReader.read(nodesPath);
-        nodeStringList.remove(0);
-        List<Node> nodeList = Main.connectNeighbours(nodeStringList);
+        List<String[]> inputStringList = CSVFileReader.read(nodesPath);
+        inputStringList.remove(0);
+        List<Node> nodeList = Main.connectNeighbours(inputStringList);
+
+        // Read taxis and create a taxiList with taxi nodes
+        inputStringList = CSVFileReader.read(taxisPath);
+        inputStringList.remove(0);
+
+        List<Node> taxiList = new LinkedList<>();
+        for(String[] taxi : inputStringList) {
+            taxiList.add(findNearestNode(nodeList, taxi));
+        }
+
+
+        // Read client and set a target node
+        inputStringList = CSVFileReader.read(clientPath);
+        inputStringList.remove(0);
+
+        Node target = findNearestNode(nodeList, inputStringList.get(0));
+
 
     }
 }
